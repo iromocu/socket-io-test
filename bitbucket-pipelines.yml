@@ -1,0 +1,53 @@
+image: timbru31/java-node
+
+definitions:
+  services:
+    docker-agenda:
+      memory: 5120
+      type: docker
+
+  steps:
+    - step: &CodeLint
+        name: Code lint
+        image: node:16
+        script:
+          - npm install
+        caches:
+          - node
+    - step: &AnalysisCode
+        name: Analysis code
+        image: vla45mx/node-16.18.0_openjdk-17-jdk
+        script:
+          - npm install
+          - chmod 777 node_modules/sonar-scanner/bin/sonar-scanner
+          - npm run sonar
+    - step: &BuildPushImage
+        name: Build and push image
+        size: 2x
+        image: node:16
+        services:
+          - docker-agenda
+        script:
+          - npm install
+          - export ENVIRONMENT=""
+          - if [ "$BITBUCKET_BRANCH" = "main" ]; then ENVIRONMENT="prod"; elif [ "$BITBUCKET_BRANCH" = "qa" ]; then ENVIRONMENT="qa"; else ENVIRONMENT="dev"; fi
+          - echo "Environment is $ENVIRONMENT"
+          - commit_id="${BITBUCKET_COMMIT:0:12}"
+          - echo "commit_id is $commit_id"
+          - docker login --username="$DOCKER_OCI_USER" --password="$DOCKER_OCI_PASS" $DOCKER_OCI_HOST
+          - docker build --tag="msvc_scktio:latest" --tag="msvc_scktio:$commit_id" --build-arg ENVIRONMENT=$ENVIRONMENT .
+          - docker tag msvc_scktio:latest iad.ocir.io/id3ytacw93ev/grm/$ENVIRONMENT/msvc_scktio:latest
+          - docker tag msvc_scktio:$commit_id iad.ocir.io/id3ytacw93ev/grm/$ENVIRONMENT/msvc_scktio:$commit_id
+          - docker push iad.ocir.io/id3ytacw93ev/grm/$ENVIRONMENT/msvc_scktio:latest
+          - docker push iad.ocir.io/id3ytacw93ev/grm/$ENVIRONMENT/msvc_scktio:$commit_id
+pipelines:
+  branches:
+    develop:
+      - step: *CodeLint
+      - step: *BuildPushImage
+    qa:
+      - step: *CodeLint
+      - step: *BuildPushImage
+    main:
+      - step: *CodeLint
+      - step: *BuildPushImage
