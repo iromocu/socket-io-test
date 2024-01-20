@@ -1,5 +1,5 @@
 # build stage
-FROM node:16.18.0 as build-stage
+FROM node:18.16.0 as build-stage
 
 ARG ENVIRONMENT=prod //Default value provided for prod and test
 
