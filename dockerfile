@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run ${ENVIRONMENT}
+RUN npm run 
 COPY Staticfile ./dist
     
 # production stage
