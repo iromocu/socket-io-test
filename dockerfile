@@ -9,8 +9,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run 
-COPY Staticfile ./dist
+RUN npm run build
+COPY Staticfile ./
     
 # production stage
 FROM nginx:stable-alpine as production-stage
