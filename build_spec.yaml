@@ -1,0 +1,14 @@
+version: 0.1
+component: build
+timeoutInSeconds: 10000
+shell: bash
+env:
+  exportedVariables:
+    - COMMIT_HASH_VALUE
+
+steps:
+  - type: Command
+    name: "Set exported variables"
+    command: |
+      export COMMIT_HASH_VALUE="${OCI_TRIGGER_COMMIT_HASH}"
+      echo "Environment is $COMMIT_HASH_VALUE"
