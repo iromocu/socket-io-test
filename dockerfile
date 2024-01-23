@@ -1,13 +1,13 @@
 # build stage
 FROM node:18.16.0 as build-stage
 
-ARG ENVIRONMENT=prod //Default value provided for prod and test
+ARG ENVIRONMENT=qa //Default value provided qa
 
 RUN echo "${ENVIRONMENT}"
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --force
 COPY . .
 RUN npm run build
 COPY Staticfile ./dist
