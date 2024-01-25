@@ -9,7 +9,7 @@ definitions:
   steps:
     - step: &CodeLint
         name: Code lint
-        image: node:16
+        image: node:18.12.1
         script:
           - npm install
         caches:
@@ -24,7 +24,7 @@ definitions:
     - step: &BuildPushImage
         name: Build and push image
         size: 2x
-        image: node:16
+        image: node:18.12.1
         services:
           - docker-agenda
         script:
